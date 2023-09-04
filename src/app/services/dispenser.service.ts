@@ -18,6 +18,13 @@ export class DispenserService {
     return this.http.get<Dispenser[]>(url).pipe(catchError(this.handleError));
   }
 
+  manageDispenserStatus(item: Dispenser) {
+    const updateUrl = `${this.url}/${item.id}`;
+    return this.http
+      .patch<Dispenser>(updateUrl, item)
+      .pipe(catchError(this.handleError));
+  }
+
   handleError(error: HttpErrorResponse) {
     return throwError(() => `${error.statusText}`);
   }

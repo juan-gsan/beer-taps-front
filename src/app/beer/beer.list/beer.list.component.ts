@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { DispenserService } from 'src/app/services/dispenser.service';
+import { UsageService } from 'src/app/services/usage.service';
 import { Dispenser } from 'src/models/dispenser';
+import { DispenserUsage } from 'src/models/dispenser.usage';
 
 @Component({
   selector: 'app-beer.list',
@@ -9,7 +11,11 @@ import { Dispenser } from 'src/models/dispenser';
 })
 export class BeerListComponent implements OnInit {
   items: Dispenser[] = [];
-  constructor(public dispenserService: DispenserService) {}
+  usage: DispenserUsage = {} as DispenserUsage;
+  constructor(
+    public dispenserService: DispenserService,
+    public usageService: UsageService
+  ) {}
 
   ngOnInit(): void {
     this.loadAllDispensers();
@@ -22,19 +28,31 @@ export class BeerListComponent implements OnInit {
     });
   }
 
-  toggleStatus(item: Dispenser) {
-    item.status = !item.status;
+  openDispenser(item: Dispenser) {
+    this.usageService.openUsage(item).subscribe((usage) => {
+      this.usage = usage;
+      this.usageService.usage$.next(usage);
+    });
+  }
 
-    // Call a service method to update the item's status on the server (if needed)
-    // For example, you might want to send an HTTP request to update the status.
-    // This depends on your backend implementation.
-    // this.dispenserService.updateDispenserStatus(item).subscribe(
-    //   () => {
-    //     // Success callback, if needed
-    //   },
-    //   (error) => {
-    //     // Handle error, if needed
-    //   }
-    // );
+  closeDispenser(item: Dispenser) {
+    this.usageService.closeUsage(item).subscribe((usage) => {
+      this.usage = usage;
+      this.usageService.usage$.next(usage);
+    });
+  }
+
+  toggleStatus(item: Dispenser) {
+    this.dispenserService
+      .manageDispenserStatus(item)
+      .subscribe(() => (item.status = !item.status));
+
+    if (!item.status) {
+      this.openDispenser(item);
+    }
+
+    if (item.status) {
+      this.closeDispenser(item);
+    }
   }
 }

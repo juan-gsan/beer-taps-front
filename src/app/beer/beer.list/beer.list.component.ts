@@ -43,10 +43,6 @@ export class BeerListComponent implements OnInit {
   }
 
   toggleStatus(item: Dispenser) {
-    this.dispenserService
-      .manageDispenserStatus(item)
-      .subscribe(() => (item.status = !item.status));
-
     if (!item.status) {
       this.openDispenser(item);
     }
@@ -54,5 +50,9 @@ export class BeerListComponent implements OnInit {
     if (item.status) {
       this.closeDispenser(item);
     }
+
+    this.dispenserService
+      .manageDispenserStatus(item)
+      .subscribe(() => (item.status = !item.status));
   }
 }

@@ -3,10 +3,10 @@
     <ul class="beers">
       <li *ngFor="let item of dispenserService.dispensers$ | async">
         <h2>{{item.beerName}}</h2>
-        <p>{{item.cost}} €/liter</p>
-        <p>{{item.totalAmount}}</p>
-        <p>{{item.timesUsed}}</p>
-        <p>{{item.totalCost}}</p>
+        <p>Cost: {{item.cost}} €/liter</p>
+        <p>Total amount: {{item.totalAmount}}</p>
+        <p>Times used: {{item.timesUsed}}</p>
+        <p>Total cost: {{item.totalCost}}</p>
         <section class="button">
           <button (click)="toggleStatus(item, usage)">
             {{ item.status ? 'Close' : 'Open' }}

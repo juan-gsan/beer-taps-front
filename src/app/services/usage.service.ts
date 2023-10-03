@@ -24,10 +24,10 @@ export class UsageService {
       .pipe(catchError(this.handleError));
   }
 
-  closeUsage(item: Dispenser) {
-    const closeUrl = `${this.url}/${item.id}`;
+  updateUsage(item: DispenserUsage) {
+    const updateUrl = `${this.url}/${item.id}`;
     return this.http
-      .patch<DispenserUsage>(closeUrl, {})
+      .patch<DispenserUsage>(updateUrl, {})
       .pipe(catchError(this.handleError));
   }
 

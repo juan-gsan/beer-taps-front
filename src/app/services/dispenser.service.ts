@@ -8,16 +8,25 @@ import { Dispenser } from 'src/models/dispenser';
 export class DispenserService {
   public url = 'http://localhost:5097/Beer';
   dispensers$: BehaviorSubject<Dispenser[]>;
+  dispenser$: BehaviorSubject<Dispenser>;
 
   constructor(public http: HttpClient) {
     const initialDispensers: Dispenser[] = [];
+    const initialDispenser: Dispenser = {} as Dispenser;
     this.dispensers$ = new BehaviorSubject(initialDispensers);
+    this.dispenser$ = new BehaviorSubject(initialDispenser);
   }
 
   getAllDispensers(url: string = this.url): Observable<Dispenser[]> {
     return this.http.get<Dispenser[]>(url).pipe(catchError(this.handleError));
   }
 
+  getDispenserById(id: number): Observable<Dispenser> {
+    const getByIdUrl = `${this.url}/${id}`;
+    return this.http
+      .get<Dispenser>(getByIdUrl)
+      .pipe(catchError(this.handleError));
+  }
   manageDispenserStatus(item: Dispenser) {
     const updateUrl = `${this.url}/${item.id}`;
     return this.http

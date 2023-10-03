@@ -37,7 +37,6 @@ export class BeerListComponent implements OnInit {
       this.dispenserService.getAllDispensers().subscribe((dispensers) => {
         this.items = dispensers;
         this.dispenserService.dispensers$.next(dispensers);
-        console.log(dispensers);
       });
     });
   }
@@ -78,6 +77,7 @@ export class BeerListComponent implements OnInit {
     });
 
     this.updateDispensersUsage?.unsubscribe();
+    this.loadAllDispensers();
   }
 
   toggleStatus(item: Dispenser, usage: DispenserUsage) {

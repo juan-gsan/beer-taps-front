@@ -1,6 +1,6 @@
 <section class="beer-list">
-  <div class="beer">
-    <ul>
+  <div class="beers-container">
+    <ul class="beers">
       <li *ngFor="let item of dispenserService.dispensers$ | async">
         <h2>{{item.beerName}}</h2>
         <p>{{item.cost}} €/liter</p>

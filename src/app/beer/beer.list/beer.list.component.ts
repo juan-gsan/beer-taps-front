@@ -31,9 +31,9 @@ export class BeerListComponent implements OnInit {
     });
   }
 
-  loadDispensersEverySecond(item: DispenserUsage) {
+  loadDispensersEverySecond() {
     this.updateDispensersUsage = interval(1000).subscribe(() => {
-      this.updateDispenser(item);
+      this.updateDispenser();
       this.dispenserService.getAllDispensers().subscribe((dispensers) => {
         this.items = dispensers;
         this.dispenserService.dispensers$.next(dispensers);
@@ -41,56 +41,71 @@ export class BeerListComponent implements OnInit {
     });
   }
 
-  openDispenser(item: Dispenser) {
-    this.usageService.openUsage(item).subscribe((usage) => {
-      item.totalAmount = item.totalAmount + usage.amount;
-      item.totalCost = item.totalCost + usage.cost;
+  loadDispenserLastUpdate() {
+    this.updateDispenser();
+    this.dispenserService
+      .getDispenserById(this.usage.dispenserId)
+      .subscribe((dispenser) => {
+        this.dispenser = dispenser;
+        this.dispenser.status = !this.dispenser.status;
+        this.dispenserService.dispenser$.next(this.dispenser);
+
+        this.dispenserService.getAllDispensers().subscribe((dispensers) => {
+          this.items = dispensers;
+          this.dispenserService.dispensers$.next(this.items);
+        });
+      });
+  }
+
+  openDispenser() {
+    this.usageService.openUsage(this.dispenser).subscribe((usage) => {
+      this.dispenser.totalAmount = this.dispenser.totalAmount + usage.amount;
+      this.dispenser.totalCost = this.dispenser.totalCost + usage.cost;
+
       this.usage = usage;
       this.usageService.usage$.next(usage);
-      this.loadDispensersEverySecond(usage);
+      this.loadDispensersEverySecond();
     });
   }
 
-  updateDispenser(item: DispenserUsage) {
-    this.dispenserService
-      .getDispenserById(item.dispenserId)
-      .subscribe((dispenser) => {
-        this.dispenser = dispenser;
-        this.dispenserService.dispenser$.next(dispenser);
-      });
-    this.usageService.updateUsage(item).subscribe((usage) => {
+  updateDispenser() {
+    this.usageService.updateUsage(this.usage).subscribe((usage) => {
       this.usage = usage;
       this.usageService.usage$.next(usage);
+      this.dispenserService
+        .getDispenserById(this.usage.dispenserId)
+        .subscribe((dispenser) => {
+          this.dispenser = dispenser;
+          this.dispenserService.dispenser$.next(dispenser);
+        });
     });
   }
 
-  closeDispenser(item: DispenserUsage) {
-    this.dispenserService
-      .getDispenserById(item.dispenserId)
-      .subscribe((dispenser) => {
-        this.dispenser = dispenser;
-        this.dispenserService.dispenser$.next(dispenser);
-      });
-    this.usageService.updateUsage(item).subscribe((usage) => {
-      this.usage = usage;
-      this.usageService.usage$.next(usage);
-    });
-
+  closeDispenser() {
     this.updateDispensersUsage?.unsubscribe();
-    this.loadAllDispensers();
+
+    this.usageService.closeUsage(this.usage).subscribe((usage) => {
+      this.usage = usage;
+      this.usageService.usage$.next(usage);
+      this.dispenserService
+        .getDispenserById(this.usage.dispenserId)
+        .subscribe((dispenser) => {
+          this.dispenser = dispenser;
+          this.dispenserService.dispenser$.next(this.dispenser);
+        });
+    });
   }
 
-  toggleStatus(item: Dispenser, usage: DispenserUsage) {
+  toggleStatus(item: Dispenser) {
+    this.dispenser = item;
     if (!item.status) {
-      this.openDispenser(item);
+      this.openDispenser();
+      item.status = !item.status;
+      return;
     }
 
-    if (item.status) {
-      this.closeDispenser(usage);
-    }
-
-    this.dispenserService
-      .manageDispenserStatus(item)
-      .subscribe(() => (item.status = !item.status));
+    this.loadDispenserLastUpdate();
+    this.closeDispenser();
+    item.timesUsed += 1;
   }
 }

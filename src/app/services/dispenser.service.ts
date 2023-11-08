@@ -27,12 +27,6 @@ export class DispenserService {
       .get<Dispenser>(getByIdUrl)
       .pipe(catchError(this.handleError));
   }
-  manageDispenserStatus(item: Dispenser) {
-    const updateUrl = `${this.url}/${item.id}`;
-    return this.http
-      .patch<Dispenser>(updateUrl, item)
-      .pipe(catchError(this.handleError));
-  }
 
   handleError(error: HttpErrorResponse) {
     return throwError(() => `${error.statusText}`);

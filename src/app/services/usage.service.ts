@@ -31,6 +31,13 @@ export class UsageService {
       .pipe(catchError(this.handleError));
   }
 
+  closeUsage(item: DispenserUsage) {
+    const closeUrl = `${this.url}/close/${item.id}`;
+    return this.http
+      .patch<DispenserUsage>(closeUrl, {})
+      .pipe(catchError(this.handleError));
+  }
+
   handleError(error: HttpErrorResponse) {
     return throwError(() => `${error.statusText}`);
   }

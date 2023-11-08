@@ -8,7 +8,7 @@
         <p>Times used: {{item.timesUsed}}</p>
         <p>Total cost: {{item.totalCost}}</p>
         <section class="button">
-          <button (click)="toggleStatus(item, usage)">
+          <button (click)="toggleStatus(item)">
             {{ item.status ? 'Close' : 'Open' }}
           </button>
         </section>
